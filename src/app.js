@@ -109,7 +109,7 @@ $(document).ready(() => {
     });
 
     socket.on('usuarioEntrou', function(data) {
-        let msg = data.msg.replace('[!!{username}!!](usernameOnClick)', `<strong>${data.nomeUsuario}</strong>`)
+        let msg = data.msg.replace('{usuario}', `<strong>${data.nomeUsuario}</strong>`)
         $('#historico').append(`<div class="info">${msg}</div>`)
     });
 

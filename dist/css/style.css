@@ -268,6 +268,31 @@ h1 {
     color: hsla(187, 52%, 15%, 1);
 }
 
+/* Suporte a Markdown */
+
+.mensagem p {
+    margin: 0
+}
+
+.mensagem h2,
+.mensagem h3,
+.mensagem h4,
+.mensagem h5,
+.mensagem h6 {
+    margin: 3px 0px;
+    font-weight: 300;
+}
+
+.mensagem>br {
+    display: none;
+}
+
+.mensagem code {
+    background-color: hsla(187, 55%, 49%, 1);
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
 @media (max-width: 600px) {
     h1 {
         font-size: 1.7rem;

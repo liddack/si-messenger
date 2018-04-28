@@ -119,6 +119,9 @@ $(document).ready(() => {
     });
 
     function renderizarMensagens(msgs) {
+        if ($(`#msg-${msgs[0].timestamp}`).length) {
+            $('#historico').empty();
+        }
         for (let msg of msgs) {
             let textoEmLinhas = msg.msg.replace(new RegExp("\n", 'g'), "<br/>");
 

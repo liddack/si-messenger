@@ -1,6 +1,11 @@
-const port = (process.env.PORT || 5000),
-      express = require('express'),
-      MensagensDAO = require('./mensagensDAO')
+const port = (process.env.PORT || 5000);
+const express = require('express');
+const MensagensDAO = require('./mensagensDAO');
+const showdown = require('showdown');
+const converter = new showdown.Converter({
+    simplifiedAutoLink: true,
+    simpleLineBreaks: false
+});
 
 let app = express();
 
@@ -13,12 +18,15 @@ app.get('/', (req, res) => {
 let server, socket;
 
 let msgDB = new MensagensDAO((socket) => {
-    userMap = {};
+    userMap = Object.create(null);
     server = app.listen(port, () => console.log('Servidor subiu.'))
     socket = require('socket.io').listen(server)
 
     socket.on('connection', function (socket) {
         msgDB.getMsgs((err, msgs) => {
+            for (let msg of msgs) {
+                msg.msg = converter.makeHtml(msg.msg);
+            }
             socket.emit('ready', { id: socket.client.id, msgs });
         })
 
@@ -48,18 +56,19 @@ let msgDB = new MensagensDAO((socket) => {
 
         socket.on('msgParaServidor', function (data) {
             console.log('mensagem de ' + data.nomeUsuario + ': ' + data.msg)
-
             let msg = {
                 usuario: data.nomeUsuario,
                 timestamp: Date.now(),
                 msg: data.msg
-            }
+            };
 
             msgDB.inserirMsg(msg, (err, result) => {
                 if (err) console.error(err);
                 else console.log('Mensagem salva no BD')
 
             })
+
+            data.msg = converter.makeHtml(data.msg);
 
             // Diálogo 
             socket.emit('msgParaCliente', {

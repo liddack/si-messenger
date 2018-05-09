@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="manifest" href="./manifest.json">
+    <!-- JavaScript -->
+    <script src="bundle.js"></script>
+    <title>SI Messenger</title>
+</head>
+<body>
+    <div class="spinner">
+        <img src="/images/spinner.png" alt="Carregando..." class="girar">
+    </div>
+    <div id="erro-conexao">
+        <div class="embrulho">
+            <div class="dialogo">
+                <h3 class="title"><i class="fas fa-circle-notch girar"></i> Aos trancos e barrancos</h3>
+                <p>Bem, o aplicativo não está conseguindo se conectar ao servidor. Qualquer coisa, culpe a WSP.</p>
+                <p class="fim">O aplicativo se reconectará automaticamente assim que houver uma boa conexão...</p>
+            </div>
+        </div>
+    </div>
+    <div id="splash">
+        <div class="embrulho">
+                <div class="title">
+                    <span>Boas vindas ao</span>
+                    <h1>SI Messenger</h1>
+                </div>
+                <form class="usuario">
+                    <div>Digite seu nome de usuário:</div>
+                    <input type="text" id="usuario" placeholder="Escolha um bem bacana" autocomplete="off">
+                    <button type="submit" id="enviausuario">Entrar</button>
+                </form>
+        </div>
+    </div>
+    <div id="principal">
+        <div class="embrulho">
+                <h1>SI Messenger</h1>
+                <div id="historico"></div>
+                <form class="div-mensagem">
+                    <textarea id="msg" rows="1" placeholder="Digite sua mensagem..."></textarea>
+                    <button type="submit" id="enviar">Enviar</button>
+                </form>
+            </div>
+    </div>
+    <script async defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+        crossorigin="anonymous"></script>
+</body>
+</html>

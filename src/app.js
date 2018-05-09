@@ -3,10 +3,16 @@ import Cookies from "js-cookie"
 import io from "socket.io-client"
 import autosize from "autosize"
 
+// JS com código para o phonegap
+import phonegap from "./phonegap.js"
+
+// Estilo CSS para o Webpack injetar no HTML
+import css from './style.css'
+
 $(document).ready(() => {
     // Inicializa o Socket.io, que é responsável pela troca de mensagens
     // instantânea entre os vários clientes
-    const socket = io(window.location.href);
+    const socket = io('http://si-messenger.herokuapp.com');
     // Usa o js-cookie pra ver se já há um nome de usuário presente no navegador e
     // se tiver, armazena na variável 'nomeUsuario'. Se não tiver, ele atribui um valor 
     // chamado 'undefined', que funciona como 'false' em um if.
@@ -24,7 +30,27 @@ $(document).ready(() => {
 
     // Executa o código abaixo caso o socket consiga se conectar
     socket.on('ready', function(data) {
-        console.log(data.msgs)
+        if ("Notification" in window) {
+            Notification.requestPermission(function (permission) {
+                // If the user accepts, let’s create a notification
+                if (permission === 'granted') {
+                    let notification = new Notification('My title', {
+                        tag: 'message1',
+                        body: 'My body'
+                    });
+                    notification.onshow = function () {
+                        console.log('show');
+                    };
+                    notification.onclose = function () {
+                        console.log('close');
+                    };
+                    notification.onclick = function () {
+                        console.log('click');
+                        notification.close();
+                    };
+                }
+            });
+        }
         renderizarMensagens(data.msgs)
         // Verifica se há algum valor válido em 'nomeUsuario'. Se contiver um valor que
         // não seja 'false', 'null' ou 'undefined', manda abrir a janela de conversa

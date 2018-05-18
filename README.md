@@ -15,7 +15,7 @@ npm install
 
 4. Após instalar as dependências, inicie o servidor do aplicativo com o comando:
 ```sh
-node servidor.js
+npm start
 ```
 
 Pronto! O aplicativo já está rodando na sua máquina. Para ver ele funcionando, acesse o endereço http://localhost:5000.

@@ -1,21 +1,30 @@
-if (!process.env.si_messenger_dburl) {
-    throw new Error('Váriável de ambiente com o URL de conexão com o banco de dados não foi definido!')
-}
 const connectionUrl = process.env.si_messenger_dburl,
       MongoClient = require('mongodb').MongoClient,
-      log = require('fancy-log')
+      log = require('fancy-log');
+
+if (!connectionUrl) {
+    log.warn('Váriável de ambiente com o URL de conexão com o banco de dados não foi definido!\n'
+        + 'O aplicativo funcionará normalmente, mas as mensagens não serão salvas.');
+}
 
 class MensagensDAO {
     constructor(callback) {
-        MongoClient.connect(connectionUrl, (err, database) => {
-            if (err) {
-                if (callback) callback(err);
-                throw err;
-            }
-            log.info('Conectado ao banco de dados')
-            this.msgDB = database.db('si-messenger')
-            callback(this.msgDB)
-        })
+        if (connectionUrl) {
+            MongoClient.connect(connectionUrl, (err, database) => {
+                if (err) {
+                    if (callback) callback(err);
+                    throw err;
+                }
+                log.info('Conectado ao banco de dados');
+                this.msgDB = database.db('si-messenger');
+                callback(this.msgDB);
+            });
+        } else {
+            callback({
+                erro: 'Não foi definido um banco de dados.',
+                dbOffline: true
+            });
+        }
     }
 
     inserirUsuario(usuario, callback) {

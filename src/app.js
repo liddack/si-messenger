@@ -24,7 +24,7 @@ $(document).ready(() => {
 
     // Executa o código abaixo caso o socket consiga se conectar
     socket.on('ready', function(data) {
-        console.log(data.msgs)
+        console.debug(data.msgs)
         renderizarMensagens(data.msgs)
         // Verifica se há algum valor válido em 'nomeUsuario'. Se contiver um valor que
         // não seja 'false', 'null' ou 'undefined', manda abrir a janela de conversa
@@ -77,7 +77,6 @@ $(document).ready(() => {
     $('form.div-mensagem').submit(function(e) {
         e.preventDefault();
         var msg = $('#msg').val()
-        console.log($('#msg').val())
         if (msg.length > 0) {
             socket.emit(
                 'msgParaServidor',
@@ -114,12 +113,12 @@ $(document).ready(() => {
     });
 
     socket.on('msgParaCliente', function(data) {
-        console.log(data)
+        console.debug(data)
         renderizarMensagens(data.msgs)
     });
 
     function renderizarMensagens(msgs) {
-        if ($(`#msg-${msgs[0].timestamp}`).length) {
+        if (msgs.length > 0 &&  $(`#msg-${msgs[0].timestamp}`).length) {
             $('#historico').empty();
         }
         for (let msg of msgs) {

@@ -2,6 +2,7 @@ const port = (process.env.PORT || 5000);
 const express = require('express');
 const MensagensDAO = require('./mensagensDAO');
 const showdown = require('showdown');
+const io = require('socket.io');
 const converter = new showdown.Converter({
     simplifiedAutoLink: true,
     simpleLineBreaks: false
@@ -15,38 +16,50 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/dist/index.html')
 })
 
-let server, socket;
+let server;
 
-let msgDB = new MensagensDAO((socket) => {
-    userMap = Object.create(null);
+let msgDB = new MensagensDAO((res) => {
+    let userMap = Object.create(null);
     server = app.listen(port, () => console.log('Servidor subiu.'))
-    socket = require('socket.io').listen(server)
+    const socket = io.listen(server)
 
     socket.on('connection', function (socket) {
-        msgDB.getMsgs((err, msgs) => {
-            for (let msg of msgs) {
-                msg.msg = converter.makeHtml(msg.msg);
-            }
-            socket.emit('ready', { id: socket.client.id, msgs });
-        })
+        if (res.dbOffline) {
+            socket.emit('ready', { id: socket.client.id, msgs: [] });
+        } else {
+            msgDB.getMsgs((err, msgs) => {
+                for (let msg of msgs) {
+                    msg.msg = converter.makeHtml(msg.msg);
+                }
+                socket.emit('ready', { id: socket.client.id, msgs });
+            })
+        }
 
-        socket.on('usuarioSeConectou', (data) => {
+        socket.on('usuarioSeConectou', data => {
             console.log('Usuário ' + data.nomeUsuario + ' se conectou (id: ' + data.id + ')')
             userMap[data.id] = data.nomeUsuario;
         })
 
         socket.on('novoUsuario', data => {
+            let anunciar = (data) => {
+                console.info(`Usuário ${data.nomeUsuario} ${res.dbOffline ? 'registrado' : 'cadastrado'}!`)
+                userMap[data.id] = data.nomeUsuario;
+                data.msg = msgBoasVindas()
+                socket.broadcast.emit('usuarioEntrou', data)
+            }
+
             console.log('Tentando adicionar usuário ' + data.nomeUsuario)
-            msgDB.inserirUsuario({ usuario: data.nomeUsuario }, (err, results) => {
-                socket.emit('resultCadastro', { err, res: results, usuario: data.nomeUsuario })
-                console.error(err)
-                if (!err) {
-                    console.info(`Usuário ${data.nomeUsuario} cadastrado!`)
-                    userMap[data.id] = data.nomeUsuario;
-                    data.msg = msgBoasVindas()
-                    socket.broadcast.emit('usuarioEntrou', data)
-                }
-            })
+            if (res.dbOffline) {
+                socket.emit('resultCadastro', { err: null, res: null, usuario: data.nomeUsuario })
+                anunciar(data);
+            } else {
+                msgDB.inserirUsuario({ usuario: data.nomeUsuario }, (err, results) => {
+                    socket.emit('resultCadastro', { err, res: results, usuario: data.nomeUsuario })
+                    if (!err) {
+                        anunciar(data)
+                    }
+                })
+            }
         })
 
         socket.on('disconnect', function () {
@@ -62,11 +75,12 @@ let msgDB = new MensagensDAO((socket) => {
                 msg: data.msg
             };
 
-            msgDB.inserirMsg(msg, (err, result) => {
-                if (err) console.error(err);
-                else console.log('Mensagem salva no BD')
-
-            })
+            if (!res.dbOffline) {
+                msgDB.inserirMsg(msg, (err, result) => {
+                    if (err) console.error(err);
+                    else console.log('Mensagem salva no BD')
+                })
+            }
 
             data.msg = converter.makeHtml(data.msg);
 

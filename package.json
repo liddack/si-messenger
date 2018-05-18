@@ -6,8 +6,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node .",
-    "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
+    "start": "npm run build && node .",
+    "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress",
+    "build": "npx webpack --mode production",
+    "build-dev": "npx webpack --mode development"
   },
   "dependencies": {
     "autosize": "^4.0.1",
@@ -22,6 +24,6 @@
   },
   "devDependencies": {
     "webpack": "^4.5.0",
-    "webpack-cli": "^2.0.14"
+    "webpack-cli": "^2.1.3"
   }
 }

@@ -10,6 +10,8 @@
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
   },
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.8",
+    "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "autosize": "^4.0.1",
     "css-loader": "^0.28.11",
     "express": "^4.16.3",
@@ -24,6 +26,6 @@
   },
   "devDependencies": {
     "webpack": "^4.5.0",
-    "webpack-cli": "^2.0.14"
+    "webpack-cli": "^2.1.4"
   }
 }

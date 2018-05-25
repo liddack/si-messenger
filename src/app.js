@@ -2,6 +2,10 @@ import $ from "jquery"
 import Cookies from "js-cookie"
 import io from "socket.io-client"
 import autosize from "autosize"
+import fontawesome from '@fortawesome/fontawesome'
+import fasCircleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch'
+
+fontawesome.library.add(fasCircleNotch);
 
 // JS com código para o phonegap
 import phonegap from "./phonegap.js"

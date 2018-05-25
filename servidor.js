@@ -28,8 +28,10 @@ let msgDB = new MensagensDAO((res) => {
             socket.emit('ready', { id: socket.client.id, msgs: [] });
         } else {
             msgDB.getMsgs((err, msgs) => {
-                for (let msg of msgs) {
-                    msg.msg = converter.makeHtml(msg.msg);
+                if (msgs) {
+                    for (let msg of msgs) {
+                        msg.msg = converter.makeHtml(msg.msg);
+                    }
                 }
                 socket.emit('ready', { id: socket.client.id, msgs });
             })

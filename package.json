@@ -1,10 +1,10 @@
 {
   "name": "si-messenger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "servidor.js",
   "author": "Lucas Miranda <liddack@outlook.com>",
   "license": "MIT",
-  "private": true,
+  "repository": "https://github.com/liddack/si-messenger",
   "scripts": {
     "start": "npm run build && node .",
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress",

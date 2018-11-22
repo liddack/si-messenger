@@ -25,7 +25,7 @@ class MensagensDAO {
         resolve(this.msgDB)
       } else {
         this.dbOffline = true
-        reject({
+        resolve({
           erro: 'Não foi definido um banco de dados.',
           dbOffline: true
         })
@@ -61,6 +61,9 @@ class MensagensDAO {
   async inserirMsg(msg) {
     if (!this.dbOffline) {
       return await this.msgDB.collection('mensagens').insertOne(msg)
+        .then(() => {
+          console.log('Mensagem salva no BD')
+        })
     }
   }
 }

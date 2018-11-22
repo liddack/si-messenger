@@ -109,9 +109,6 @@ function msgParaServidor(data) {
     msg: data.msg
   }
   msgDAO.inserirMsg(msg)
-    .then(() => {
-      console.log('Mensagem salva no BD')
-    })
     .catch(console.error)
   data.msg = converter.makeHtml(data.msg)
   // Diálogo 

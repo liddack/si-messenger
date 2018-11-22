@@ -1,62 +1,68 @@
-const connectionUrl = process.env.si_messenger_dburl,
-      MongoClient = require('mongodb').MongoClient,
-      log = require('fancy-log'),
-      nomeDB = connectionUrl ? connectionUrl.split('/').pop() : null;
-if (!connectionUrl) {
-    log.warn('Váriável de ambiente com o URL de conexão com o banco de dados não foi definido!\n'
-        + 'O aplicativo funcionará normalmente, mas as mensagens não serão salvas.');
-}
+const MongoClient = require('mongodb').MongoClient
+const log = require('fancy-log')
 
 class MensagensDAO {
-    constructor(callback) {
-        if (connectionUrl) {
-            MongoClient.connect(connectionUrl, (err, database) => {
-                if (err) {
-                    if (callback) callback(err);
-                    throw err;
-                }
+  constructor() {
+    this.msgDB = null
+    this.connectionUrl = process.env.si_messenger_dburl,
+    this.nomeDB = this.connectionUrl ? this.connectionUrl.split('/').pop() : null
 
-                log.info('Conectado ao banco de dados');
-                this.msgDB = database.db(nomeDB);
-                callback(this.msgDB);
-            });
-        } else {
-            callback({
-                erro: 'Não foi definido um banco de dados.',
-                dbOffline: true
-            });
-        }
+    if (!this.connectionUrl) {
+      log.warn('Váriável de ambiente com o URL de conexão com o banco de dados não foi definido!\n' +
+        'O aplicativo funcionará normalmente, mas as mensagens não serão salvas.')
     }
+  }
 
-    inserirUsuario(usuario, callback) {
-        this.msgDB.collection('usuarios').find({
-            usuario: { $eq: usuario.usuario }
-        }).toArray((err, result) => {
-            if (result[0] != undefined) {
-                if (callback) callback("O usuário já existe.");
-            } else {
-                this.msgDB.collection('usuarios').insert(usuario, function (err, result) {
-                    if (callback) callback(err, result);
-                });
-            }
-        });
-    }
-    
-    getMsgs(callback) {
-        this.msgDB.collection('mensagens').find().toArray((err, results) => {
-            if (err) {
-                if (callback) callback(err);
-                throw err;
-            }
-            if (callback) callback(null, results)
+  connect() {
+    return new Promise(async (resolve, reject) => {
+      if (this.connectionUrl) {
+        const database = await MongoClient.connect(this.connectionUrl, {
+          useNewUrlParser: true
         })
-    }
+          .catch(reject)
+        log.info('Conectado ao banco de dados')
+        this.msgDB = database.db(this.nomeDB)
+        resolve(this.msgDB)
+      } else {
+        this.dbOffline = true
+        reject({
+          erro: 'Não foi definido um banco de dados.',
+          dbOffline: true
+        })
+      }
+    })
+  }
 
-    inserirMsg(msg, callback) {
-        this.msgDB.collection('mensagens').insert(msg, function (err, result) {
-            if (callback) callback(err, result);
-        });
+  inserirUsuario(usuario) {
+    if (!this.dbOffline) {
+      return new Promise((resolve, reject) => {
+        let usuariosArr = this.msgDB.collection('usuarios').find({
+          usuario: { $eq: usuario.usuario }
+        }).toArray()
+          .catch(reject)
+        if (usuariosArr[0] != undefined) {
+          reject('O usuário já existe.')
+        } else {
+          let result = this.msgDB.collection('usuarios').insertOne(usuario)
+            .catch(reject)
+          resolve(result)
+        }
+      })
     }
+  }
+    
+  async getMsgs() {
+    return await this.msgDB
+      .collection('mensagens')
+      .find()
+      .toArray()
+  }
+
+  async inserirMsg(msg) {
+    if (!this.dbOffline) {
+      return await this.msgDB.collection('mensagens').insertOne(msg)
+    }
+  }
 }
 
 module.exports = MensagensDAO

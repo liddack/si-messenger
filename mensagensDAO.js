@@ -4,7 +4,7 @@ const log = require('fancy-log')
 class MensagensDAO {
   constructor() {
     this.msgDB = null
-    this.connectionUrl = process.env.si_messenger_dburl,
+    this.connectionUrl = process.env.MONGODB_URL,
     this.nomeDB = this.connectionUrl ? this.connectionUrl.split('/').pop() : null
 
     if (!this.connectionUrl) {

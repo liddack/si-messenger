@@ -1,6 +1,6 @@
 {
   "name": "si-messenger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "servidor.js",
   "author": "Lucas Miranda <liddack@outlook.com>",
   "license": "MIT",
